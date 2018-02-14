@@ -3,6 +3,18 @@ println("here");
 #import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConnectionFactory from: amqp-client-5.1.2.jar;
 import org.slf4j.LoggerFactory from: slf4j-api-1.7.21.jar;
+import org.json.JSONObject from: org.json-20161124.jar;
+
+sub hashtojson{
+        local('$jo $key $value');
+        $jo = [new JSONObject];
+        foreach $key => $value ($1){
+                [$jo put: $key,$value];
+        }
+        return [$jo toString];
+
+}
+
 #ConnectionFactory factory = new ConnectionFactory();
 global('$factory');
 global('$connection');
@@ -14,15 +26,25 @@ $connection = [$factory newConnection];
 #Channel channel = connection.createChannel(); 
 $channel = [$connection createChannel];
 # channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+sub publish{
+# $1 - queue
+# $2 - stirng message
+ [$channel basicPublish: "", $1, $null,cast($2, "b")];
+ println("[*] Sent message $2 to $1 queue");
+}
 
 on * { 
-	local('$message');
+	local('$message $event $rest %eventhash');
+	$event = shift(@_);
+        %eventhash["event"] = $event;
         if (($1 eq "beacons" ) || ('heartbeat*' iswm $1)){
 #		println("[*] Not reporting $1 ");	
 	}else{
 		$message = join(", ", @_);
-		[$channel basicPublish: "", "bigear", $null,cast($message, "b")];
-		println("[*] Sent message $message to test queue");
+		%eventhash["message"] = $message;
+		#[$channel basicPublish: "", "bigear", $null,cast($message, "b")];
+                
+		publish ("bigear",hashtojson(%eventhash));
 	}
 }
 #[$channel close];
