@@ -1,0 +1,33 @@
+debug(debug() | 7 | 34);
+println("here");
+#import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.ConnectionFactory from: amqp-client-5.1.2.jar;
+import org.slf4j.LoggerFactory from: slf4j-api-1.7.21.jar;
+#ConnectionFactory factory = new ConnectionFactory();
+global('$factory');
+global('$connection');
+global('$channel');
+$factory = [new ConnectionFactory];
+[$factory setHost: "localhost"];
+# Connection connection = factory.newConnection();
+$connection = [$factory newConnection];
+#Channel channel = connection.createChannel(); 
+$channel = [$connection createChannel];
+# channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+
+on * { 
+	local('$message');
+        if (($1 eq "beacons" ) || ('heartbeat*' iswm $1)){
+#		println("[*] Not reporting $1 ");	
+	}else{
+		$message = join(", ", @_);
+		[$channel basicPublish: "", "bigear", $null,cast($message, "b")];
+		println("[*] Sent message $message to test queue");
+	}
+}
+#[$channel close];
+#[$connection close];
+
+
+
+
