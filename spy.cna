@@ -47,6 +47,18 @@ on * {
 		publish ("bigear",hashtojson(%eventhash));
 	}
 }
+on beacons {
+ 	local('$beacon $x @jl $json $message $bid');
+        @jl = @();	
+	foreach $bid => $beacon ($1){
+		$json = hashtojson($beacon);
+		add(@jl,$json);
+	} 
+	$x = join(",\n",@jl);
+        $message = '[' .$x . ']';
+	publish ("bigear_beacons",$message);
+       # println($message);
+}
 #[$channel close];
 #[$connection close];
 
