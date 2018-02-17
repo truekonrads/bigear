@@ -1,0 +1,72 @@
+{
+    "languageModel": {
+        "invocationName": "big ear",
+        "intents": [
+            {
+                "name": "AMAZON.CancelIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.HelpIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "AMAZON.StopIntent",
+                "slots": [],
+                "samples": []
+            },
+            {
+                "name": "howmanybeacons",
+                "slots": [
+                    {
+                        "name": "campaign",
+                        "type": "AMAZON.SearchQuery"
+                    },
+                    {
+                        "name": "beacon_state",
+                        "type": "CDS_beacon_state"
+                    }
+                ],
+                "samples": [
+                    "How many beacons do we have",
+                    "How many {beacon_state} beacons do we have",
+                    "How many beacons does {campaign} have"
+                ]
+            }
+        ],
+        "types": [
+            {
+                "name": "CDS_beacon_state",
+                "values": [
+                    {
+                        "id": "DEAD",
+                        "name": {
+                            "value": "dead",
+                            "synonyms": []
+                        }
+                    },
+                    {
+                        "id": "INACTIVE",
+                        "name": {
+                            "value": "sleeping",
+                            "synonyms": [
+                                "inactive"
+                            ]
+                        }
+                    },
+                    {
+                        "id": "ACTIVE",
+                        "name": {
+                            "value": "active",
+                            "synonyms": [
+                                "alive"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

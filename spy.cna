@@ -16,21 +16,28 @@ sub hashtojson{
 }
 
 #ConnectionFactory factory = new ConnectionFactory();
-global('$factory');
-global('$connection');
-global('$channel');
+global('$factory $connection $channel $fanoutchan');
 $factory = [new ConnectionFactory];
 [$factory setHost: "localhost"];
 # Connection connection = factory.newConnection();
 $connection = [$factory newConnection];
 #Channel channel = connection.createChannel(); 
 $channel = [$connection createChannel];
+$fanoutchan = [$connection createChannel];
+[$fanoutchan exchangeDeclare: "beaconexch","fanout"];
+
+
 # channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
 sub publish{
 # $1 - queue
-# $2 - stirng message
+# $2 - string message
  [$channel basicPublish: "", $1, $null,cast($2, "b")];
  println("[*] Sent message $2 to $1 queue");
+}
+
+sub publishbeacons{
+ [$channel basicPublish: "beaconexch", "", $null,cast($1, "b")];
+ println("[*] Sent beacon fanout: $1");
 }
 
 on * { 
@@ -56,8 +63,7 @@ on beacons {
 	} 
 	$x = join(",\n",@jl);
         $message = '[' .$x . ']';
-	publish ("bigear_beacons",$message);
-       # println($message);
+	publishbeacons ($message);
 }
 #[$channel close];
 #[$connection close];

@@ -16,7 +16,7 @@ class App extends Component {
 		for (var i=0; i< jb.length; i++){
 		    jb[i]['last']=humanizeDuration(
 			parseInt(jb[i]['last'],10),
-			{largest: 2}
+			{largest: 1}
 		    );
 		    }
 		this.setState({ beacons: jb });
@@ -39,10 +39,10 @@ columns = [{
   key: 'computer',
 },
 
-{
+/* {
   label: 'Alive?',
   key: 'alive',
-}, 
+}, */
 
 {
 	label: 'last',

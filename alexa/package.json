@@ -1,0 +1,19 @@
+{
+  "name": "bigear-alexa",
+  "version": "0.0.1",
+  "description": "BigEar Alexa adapter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "alexa-sdk": "^1.0.25",
+    "amqplib": "^0.5.2",
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "pluralize": "^7.0.0"
+  }
+}
