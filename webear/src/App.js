@@ -5,7 +5,8 @@ import { subscribeToBeacons } from './api';
 import DataTables from 'material-ui-datatables';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import humanizeDuration from 'humanize-duration'
-
+import Push from 'push.js'
+import util from 'util'
 class App extends Component {
 
   constructor(props) {
@@ -14,13 +15,27 @@ class App extends Component {
 	{
 		var jb= JSON.parse(beacons);
 		for (var i=0; i< jb.length; i++){
-		    jb[i]['last']=humanizeDuration(
-			parseInt(jb[i]['last'],10),
-			{largest: 1}
-		    );
-		    }
+            // 
+		    jb[i]['last_formatted']=humanizeDuration((jb[i]['last']), {largest: 1});
+
+            // check if the beacon is new
+            if(this.beacons){
+                const existing_bids = this.state.beacons.map( (b) => { return b['id']});
+                if (! existing_bids.includes(jb[i]['id'])){
+                    Push.create(util.format("New beacon! %s/%s",jb[i]['user'],jb[i]['computer'])); 
+                } else {
+                    // check if perhaps the beacon was asleep and now is awake
+                    let old_b = this.beacons.find( function (b) {b['id']==this },jb[i]['id']);
+                    const TWENTY_MINUTES=1000*60*20;
+                    if (jb[i]['last']>TWENTY_MINUTES && (jb[i]['last'] - old_b['last'])<0){
+                        Push.create(util.format("Beacon  %s/%s has come back from sleep!",jb[i]['user'],jb[i]['computer'])); 
+                    }
+                }
+            }
+	   }
+
 		this.setState({ beacons: jb });
-		console.log(beacons);
+//		console.log(beacons);
 
 	}
   );
@@ -28,7 +43,7 @@ class App extends Component {
 
 state = {
   beacons: [
-	{ computer: 'empty', alive: "empty", os: "OS", user: "empty"}
+//	{ computer: 'empty', alive: "empty", os: "OS", user: "empty"}
 	
 ] // no beacons yet
 };
@@ -46,7 +61,7 @@ columns = [{
 
 {
 	label: 'last',
-	key: 'last',
+	key: 'last_formatted',
 	
 },
 {

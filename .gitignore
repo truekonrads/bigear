@@ -1,6 +1,6 @@
 .env
 *.swp
-
+*.bak
 # Logs
 logs
 *.log
