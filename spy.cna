@@ -1,5 +1,4 @@
 debug(debug() | 7 | 34);
-println("here");
 #import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConnectionFactory from: amqp-client-5.1.2.jar;
 import org.slf4j.LoggerFactory from: slf4j-api-1.7.21.jar;
@@ -16,7 +15,14 @@ sub hashtojson{
 }
 
 #ConnectionFactory factory = new ConnectionFactory();
-global('$factory $connection $channel $fanoutchan');
+global('$factory $connection $channel $fanoutchan $instancename $env');
+$env = [System getenv];
+$instancename = [$env get: "CSNAME"];
+if ($instancename eq ''){
+    println( "[WW] Instance name not set, going with IP");
+    $instancename = "CS-" . localip();
+}
+println("[DD] Instance name is is $instancename")
 $factory = [new ConnectionFactory];
 [$factory setHost: "localhost"];
 # Connection connection = factory.newConnection();
@@ -62,7 +68,7 @@ on beacons {
 		add(@jl,$json);
 	} 
 	$x = join(",\n",@jl);
-        $message = '[' .$x . ']';
+        $message = "{\"$instancename\": " . '[' .$x . ']}';
 	publishbeacons ($message);
 }
 #[$channel close];

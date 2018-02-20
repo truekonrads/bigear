@@ -13,7 +13,7 @@ io.on('connection', (client) => {
 });
 
 var amqp = require('amqplib/callback_api');
-
+var gBeacons={};
 function reformatbeacons(b) {
     newb = {};
     for (let i in b) {
@@ -49,10 +49,26 @@ amqp.connect('amqp://localhost', function(err, conn) {
                     console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
                     ch.bindQueue(q.queue, ex, '');
                     ch.consume(q.queue, function(msg) {
-                            console.log(" [x] Received %s", msg.content.toString());
+                            //console.debug(" [x] Received %s", msg.content.toString());
+
                             beacons = JSON.parse(msg.content.toString());
-                            reformatted = JSON.stringify(beacons.map(reformatbeacons));
-                            console.log(reformatted);
+
+                            for (var k in beacons){
+                                for (var i in beacons[k]){
+                                    beacons[k][i]['csname']=k;
+                                }
+//                                beacons[k]['csname']=k;
+ //                               console.log(beacons[k]);
+                                gBeacons[k]=beacons[k];       
+                            }
+                            // flatten gBeacons
+                            let flatBeacons=[];
+                            for (var k in gBeacons){
+                                flatBeacons=flatBeacons.concat(gBeacons[k]);
+                                
+                            }
+                            reformatted = JSON.stringify(flatBeacons.map(reformatbeacons));
+//                            console.log(reformatted);
                             io.sockets.emit("beacons", reformatted);
                     }, {
                         noAck: true

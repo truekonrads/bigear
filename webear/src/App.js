@@ -19,13 +19,13 @@ class App extends Component {
 		    jb[i]['last_formatted']=humanizeDuration((jb[i]['last']), {largest: 1});
 
             // check if the beacon is new
-            if(this.beacons){
+            if(this.state.beacons.length>0){
                 const existing_bids = this.state.beacons.map( (b) => { return b['id']});
                 if (! existing_bids.includes(jb[i]['id'])){
                     Push.create(util.format("New beacon! %s/%s",jb[i]['user'],jb[i]['computer'])); 
                 } else {
                     // check if perhaps the beacon was asleep and now is awake
-                    let old_b = this.beacons.find( function (b) {b['id']==this },jb[i]['id']);
+                    let old_b = this.state.beacons.find( function (b) {return b['id']===this },jb[i]['id']);
                     const TWENTY_MINUTES=1000*60*20;
                     if (jb[i]['last']>TWENTY_MINUTES && (jb[i]['last'] - old_b['last'])<0){
                         Push.create(util.format("Beacon  %s/%s has come back from sleep!",jb[i]['user'],jb[i]['computer'])); 
@@ -48,8 +48,12 @@ state = {
 ] // no beacons yet
 };
 
-
-columns = [{
+columns = [
+{
+  label: 'layer',
+  key: 'csname',
+},
+{
   label: 'computer',
   key: 'computer',
 },
